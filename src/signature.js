@@ -14,7 +14,7 @@ angular.module('signature').directive('signaturePad', ['$interval', '$timeout', 
     return {
       restrict: 'EA',
       replace: true,
-      template: '<div class="signature" style="width: 100%; max-width:{{width}}px; height: 100%; max-height:{{height}}px;"><canvas style="display: block; margin: 0 auto;" ng-mouseup="onMouseup()" ng-mousedown="notifyDrawing({ drawing: true })"></canvas></div>',
+      template: '<div class="signature" style="width: 100%; max-width:{{width}}px; height: 100%; max-height:{{height}}px;"><canvas style="display: block; margin: 0 auto;" ng-mouseleave="onMouseup()" ng-mouseup="onMouseup()" ng-mousedown="onMousedown()"></canvas></div>',
       scope: {
         accept: '=?',
         clear: '=?',
@@ -36,11 +36,19 @@ angular.module('signature').directive('signaturePad', ['$interval', '$timeout', 
           };
 
           $scope.onMouseup = function () {
-            $scope.updateModel();
+            if ($scope.mouseDown) {
+              $scope.updateModel();
 
-            // notify that drawing has ended
-            $scope.notifyDrawing({ drawing: false });
+              // notify that drawing has ended
+              $scope.notifyDrawing({ drawing: false });
+            }
+            $scope.mouseDown = false;
           };
+
+          $scope.onMousedown = function () {
+            $scope.mouseDown = true;
+            $scope.notifyDrawing({ drawing: true });
+          };          
 
           $scope.updateModel = function () {
             /*
